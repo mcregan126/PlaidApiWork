@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <script>
+        function redirectToRegister() {
+            window.location.href = "{{ url_for('users.login') }}";  // Redirect to the register page
+        }
+    </script>
+</head>
+<body>
+    <h1>Register</h1>
+    <form method="POST">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">submit</button>
+    </form>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <p><p>Already have an account?</p>
+    <button onclick="redirectToRegister()">Login</button>  <!-- Button to redirect to registration -->
+</body>
+</html>
+
+

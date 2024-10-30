@@ -1,30 +1,22 @@
+# plaid_routes.py
 
-from flask import Flask, render_template, jsonify, send_from_directory, request, session
+from flask import Blueprint, jsonify, request, session, redirect, url_for, render_template
 import http.client
 import json
 import os
-import uuid
 
-app = Flask(__name__)
-
+# Configure Plaid credentials
 client_id = "65e7b7407aa8cf001cc59e7b6247f4912edd996835254c9e47bbf4"
 secret = "6247f4912edd996835254c9e47bbf4"
 
-# string of 24 random bytes
-app.secret_key = os.urandom(24)  
-user_id = "fix"
+# Initialize the blueprint
+plaid_bp = Blueprint('plaid', __name__)
 
-
-
-@app.route('/completed')
-def completed():
-    return send_from_directory('.', 'completed.html')
-
-
-
-# Route to create the link token
-@app.route('/create_link_token', methods=['GET'])
+@plaid_bp.route('/create_link_token', methods=['GET'])
 def create_link_token():
+    if 'username' not in session:
+        return redirect(url_for('users.login'))
+    
     conn = http.client.HTTPSConnection("sandbox.plaid.com")
     headers = {'Content-Type': 'application/json'}
 
@@ -53,11 +45,11 @@ def create_link_token():
 
     return jsonify({'link_token': link_token})
 
-
-
-# Route to exchange public_token for access_token
-@app.route('/exchange_public_token', methods=['POST'])
+@plaid_bp.route('/exchange_public_token', methods=['POST'])
 def exchange_public_token():
+    if 'username' not in session:
+        return jsonify({'error': 'User not logged in'}), 401
+
     req_data = request.get_json()
     public_token = req_data.get('public_token')
 
@@ -68,8 +60,8 @@ def exchange_public_token():
     headers = {'Content-Type': 'application/json'}
 
     payload = json.dumps({
-        "client_id": "65e7b7407aa8cf001cc59e7b",
-        "secret": "6247f4912edd996835254c9e47bbf4",
+        "client_id": client_id,
+        "secret": secret,
         "public_token": public_token
     })
 
@@ -83,15 +75,11 @@ def exchange_public_token():
     if not access_token:
         return jsonify({'error': 'Failed to exchange public_token'}), 401
 
-    session['user_id'] = user_id 
     session['access_token'] = access_token
 
     return jsonify({'access_token': access_token})
 
-# Serve the frontend HTML
-@app.route('/')
-def serve_frontend():
-    return send_from_directory('.', 'frontend.html')
+@plaid_bp.route('/completed', methods=['GET', 'POST'])
+def completed():
+    return render_template('completed.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
