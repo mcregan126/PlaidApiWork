@@ -3,8 +3,6 @@ from flask_login import LoginManager
 import sqlite3
 import os
 
-
-# Import the blueprints and User class
 from users.users import users_bp, User
 from transactions.transactions import transactions_bp
 from plaid_routes import plaid_bp
@@ -12,18 +10,15 @@ from plaid_routes import plaid_bp
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-
-# Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'users.login'
 
-# Register blueprints with URL prefixes
 app.register_blueprint(users_bp, url_prefix='/users')
 app.register_blueprint(transactions_bp, url_prefix='/transactions')
 app.register_blueprint(plaid_bp)
 
-# Set up the user loader function for Flask-Login
+#user loader function for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     conn = sqlite3.connect('users.db')

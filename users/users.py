@@ -3,16 +3,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, UserMixin, current_user
 import sqlite3
 
-# Initialize Flask app
+
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Ensure you set a secret key for session management
+app.secret_key = 'your_secret_key' 
 
-
-# Blueprint for user routes
 users_bp = Blueprint('users', __name__)
 
 
-# Database initialization function
+#initalize database
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -20,7 +18,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Populate database with fake users
+#fake users
 def populate_db():
     fake_users = [
         {'username': 'testuser1', 'password': 'password1'},
@@ -36,23 +34,22 @@ def populate_db():
             hashed_password = generate_password_hash(user['password'], method='pbkdf2:sha256')
             c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (user['username'], hashed_password))
         except sqlite3.IntegrityError:
-            pass  # Ignore if the user already exists
+            pass  #ignore if the user already exists
 
     conn.commit()
     conn.close()
 
-# Call the init_db and populate_db functions
 init_db()
 populate_db()
 
-# User class
+
 class User(UserMixin):
     def __init__(self, id, username, password):
         self.id = id
         self.username = username
         self.password = password
 
-# Register route
+#register route
 @users_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -73,11 +70,11 @@ def register():
 
     return render_template('register.html')
 
-# Login route
+#login route
 @users_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return render_template('frontend.html')  # Redirect if the user is already logged in
+        return render_template('frontend.html')  #redirect if the user is already logged in
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -93,12 +90,12 @@ def login():
             user = User(id=user_data[0], username=user_data[1], password=user_data[2])
             login_user(user)  # Login the user
             session['username'] = username
-            flash('Login successful!', 'success')  # Flash success message
-            return render_template('frontend.html')  # Redirect to a different page after successful login
+            flash('Login successful!', 'success') 
+            return render_template('frontend.html')  #successful login
         else:
-            flash('Invalid username or password.', 'danger')  # Flash error message for failed login
+            flash('Invalid username or password.', 'danger')  #failed login
 
-    return render_template('login.html')  # Render login page if GET or unsuccessful login
+    return render_template('login.html') #render login page if GET or unsuccessful login
 
 if __name__ == '__main__':
     app.run(debug=True)

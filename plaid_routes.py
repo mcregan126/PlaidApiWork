@@ -5,13 +5,13 @@ import http.client
 import json
 import os
 
-# Configure Plaid credentials
+
 client_id = "65e7b7407aa8cf001cc59e7b6247f4912edd996835254c9e47bbf4"
 secret = "6247f4912edd996835254c9e47bbf4"
 
-# Initialize the blueprint
 plaid_bp = Blueprint('plaid', __name__)
 
+#create link token route
 @plaid_bp.route('/create_link_token', methods=['GET'])
 def create_link_token():
     if 'username' not in session:
@@ -45,6 +45,7 @@ def create_link_token():
 
     return jsonify({'link_token': link_token})
 
+#exchange public token for acess token
 @plaid_bp.route('/exchange_public_token', methods=['POST'])
 def exchange_public_token():
     if 'username' not in session:

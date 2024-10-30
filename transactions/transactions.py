@@ -21,11 +21,10 @@ def get_transactions():
     if not access_token:
         return jsonify({'error': 'Access token is missing'}), 401
 
-    # Set up date range
     start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
     end_date = datetime.now().strftime('%Y-%m-%d')
 
-    # Connect to Plaid API
+    #connect to Plaid API
     conn = http.client.HTTPSConnection("sandbox.plaid.com")
     headers = {'Content-Type': 'application/json'}
 
@@ -41,12 +40,12 @@ def get_transactions():
         }
     })
 
-    # Send request to Plaid
+    #send request to Plaid
     conn.request("POST", "/transactions/get", payload, headers)
     res = conn.getresponse()
     data = res.read()
 
-    # Parse response
+    #parse response
     transactions_response = json.loads(data.decode("utf-8"))
     transactions = transactions_response.get('transactions', [])
 
