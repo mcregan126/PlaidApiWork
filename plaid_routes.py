@@ -6,7 +6,7 @@ import json
 import os
 
 
-client_id = "65e7b7407aa8cf001cc59e7b6247f4912edd996835254c9e47bbf4"
+client_id = "65e7b7407aa8cf001cc59e7b"
 secret = "6247f4912edd996835254c9e47bbf4"
 
 plaid_bp = Blueprint('plaid', __name__)
@@ -21,20 +21,20 @@ def create_link_token():
     headers = {'Content-Type': 'application/json'}
 
     payload = json.dumps({
-  "client_id": "65e7b7407aa8cf001cc59e7b",
-  "secret": "6247f4912edd996835254c9e47bbf4",
-  "client_name": "InnoBank user",
-  "country_codes": [
-    "US"
-  ],
-  "language": "en",
-  "user": {
-    "client_user_id": "unique_user_id"
-  },
-  "products": [
-    "auth"
-  ]
-})
+        "client_id": client_id,
+        "secret": secret,
+        "client_name": "InnoBank user",
+        "country_codes": [
+        "US"
+        ],
+        "language": "en",
+        "user": {
+        "client_user_id": "unique_user_id"
+        },
+        "products": [
+        "auth"
+        ]
+    })
 
     conn.request("POST", "/link/token/create", payload, headers)
     res = conn.getresponse()
